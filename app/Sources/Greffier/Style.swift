@@ -604,6 +604,51 @@ struct Explication: View {
     }
 }
 
+/// « Greffier a été mis à jour. » — dit une fois, puis jamais plus.
+///
+/// On installait, l'application redémarrait, et **rien ne disait si c'était
+/// passé**. On rouvrait le menu pour vérifier, sans en être sûr, et l'on
+/// finissait par ne plus se mettre à jour du tout. Une mise à jour qu'on ne
+/// voit pas aboutir est une mise à jour qu'on cesse de faire.
+struct BandeauMiseAJourFaite: View {
+    let version: String
+    var notes: String?
+    let fermer: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 11) {
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 15)).foregroundStyle(Teinte.vert)
+            VStack(alignment: .leading, spacing: 3) {
+                Text("Greffier a été mis à jour en \(version).")
+                    .font(.system(size: 12.5, weight: .semibold))
+                    .foregroundStyle(Teinte.texte)
+                if let notes, !notes.isEmpty {
+                    Text(notes).font(.system(size: 11.5))
+                        .foregroundStyle(Teinte.texteDoux)
+                        .lineLimit(2).fixedSize(horizontal: false, vertical: true)
+                }
+            }
+            Spacer(minLength: 10)
+            BoutonDiscret(titre: "Ce qui change", icone: "arrow.up.forward") {
+                NSWorkspace.shared.open(URL(string:
+                    "https://github.com/\(VerificationVersion.depotParDefaut)/releases")!)
+            }
+            Button(action: fermer) {
+                Image(systemName: "xmark").font(.system(size: 10))
+                    .foregroundStyle(Teinte.texteFaible)
+            }
+            .buttonStyle(.plain)
+            .help("Fermer. Ce bandeau ne reviendra pas.")
+        }
+        .padding(.horizontal, 22).padding(.vertical, 13)
+        .background(Teinte.vert.opacity(0.10))
+        .overlay(alignment: .bottom) {
+            Rectangle().fill(Teinte.trait).frame(height: 1)
+        }
+    }
+}
+
 /// Ce qui manque pour que Greffier travaille bien, dit là où on le verra.
 ///
 /// **Rien ne l'annonçait.** L'avertissement sur l'identité incomplète vivait

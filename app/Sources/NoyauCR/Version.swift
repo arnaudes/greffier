@@ -6,4 +6,4 @@ import Foundation
 /// de sens pour du Swift : il vit donc ici, dans le noyau, et `build.sh` le
 /// recopie dans l'`Info.plist` du bundle au moment de la compilation. Une
 /// seule source, deux emplacements dérivés.
-public let versionGreffier = "2026.08.20.20"
+public let versionGreffier = "2026.08.20.21"

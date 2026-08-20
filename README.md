@@ -168,8 +168,10 @@ fenêtre dédiée, où ils peuvent être écoutés, transcrits ou supprimés.
 - **Elle ne tranche jamais à votre place.** Une question laissée sans réponse
   devient un point ouvert dans le compte rendu, jamais une supposition.
 - **Elle n'ajoute ni analyse ni recommandation.** Elle restitue ce qui a été dit.
-- **Elle ne se met pas à jour toute seule.** Elle vous prévient quand une
-  version plus récente est publiée, et vous installez.
+- **Elle ne s'installe jamais sans votre accord.** Quand une version plus
+  récente paraît, elle la récupère en silence puis attend votre clic ; ce clic
+  remplace l'application et la relance, sans que vous touchiez un fichier. Elle
+  vous dit ensuite qu'elle a été mise à jour.
 
 Ces règles ne se règlent pas : elles sont ce que l'application garantit.
 
@@ -184,7 +186,7 @@ tenez-en compte.
 
 ```bash
 cd app
-swift build && swift test     # 219 cas
+swift build && swift test     # 224 cas
 swift run greffier-outil      # l'aide de l'outil en ligne de commande
 ```
 

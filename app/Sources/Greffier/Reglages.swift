@@ -60,6 +60,16 @@ final class Reglages {
         didSet { defaults.set(accueilFait, forKey: Cle.accueilFait) }
     }
 
+    /// La version qui tournait au lancement précédent.
+    ///
+    /// Sert à dire « Greffier a été mis à jour » une fois l'installation faite.
+    /// Sans cela, on installe, l'application redémarre, et **rien ne dit si
+    /// c'est passé** — on rouvre le menu pour vérifier, on n'en est pas sûr,
+    /// et on finit par ne plus se mettre à jour du tout.
+    var derniereVersionLancee: String {
+        didSet { defaults.set(derniereVersionLancee, forKey: Cle.derniereVersionLancee) }
+    }
+
     /// Quand on a regardé pour la dernière fois. Une fois par jour suffit.
     var derniereVerification: Date? {
         didSet { defaults.set(derniereVerification, forKey: Cle.derniereVerification) }
@@ -165,6 +175,7 @@ final class Reglages {
         static let dossierDeTravail = "dossierDeTravail"
         static let previenir = "previenirDesMisesAJour"
         static let accueilFait = "accueilFait"
+        static let derniereVersionLancee = "derniereVersionLancee"
         static let derniereVerification = "derniereVerification"
         static let versionEcartee = "versionEcartee"
     }
@@ -190,6 +201,7 @@ final class Reglages {
         derniereVerification = defaults.object(forKey: Cle.derniereVerification) as? Date
         versionEcartee = defaults.string(forKey: Cle.versionEcartee) ?? ""
         accueilFait = defaults.bool(forKey: Cle.accueilFait)
+        derniereVersionLancee = defaults.string(forKey: Cle.derniereVersionLancee) ?? ""
     }
 
     var configClaude: ConfigClaude {

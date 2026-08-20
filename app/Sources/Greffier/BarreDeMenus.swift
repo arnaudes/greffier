@@ -82,6 +82,20 @@ final class Veilleur {
     /// nôtre et que l'utilisateur veut être prévenu.
     var miseAJour: VerificationVersion.Publication?
 
+    /// Où en est la nouvelle version : téléchargée d'avance, ou pas encore.
+    ///
+    /// Elle est récupérée dès qu'on la découvre, en silence. Le clic
+    /// « Installer » devient alors immédiat — c'est le seul moyen que la mise à
+    /// jour cesse d'être une corvée qu'on remet à plus tard.
+    enum EtatMiseAJour: Equatable {
+        case aPreparer
+        case enPreparation
+        case prete(URL)
+        case echouee(String)
+    }
+    var etatMiseAJour: EtatMiseAJour = .aPreparer
+    var installationEnCours = false
+
     /// Regarde s'il existe une version plus récente. Échoue en silence : une
     /// application qui se plaint de ne pas joindre GitHub est une application
     /// cassée aux yeux de qui l'utilise.
@@ -98,6 +112,45 @@ final class Veilleur {
             versionEcartee: reglages.versionEcartee.isEmpty ? nil : reglages.versionEcartee)
         else { miseAJour = nil; return }
         miseAJour = publication
+        if let publication { await preparer(publication) }
+    }
+
+    /// Récupère la nouvelle version sans rien installer, pour que le moment
+    /// venu il n'y ait plus qu'un clic.
+    func preparer(_ publication: VerificationVersion.Publication) async {
+        // Le ménage d'abord : garder les archives de trois versions passées
+        // occuperait le disque pour rien.
+        InstallationMiseAJour.oublierLesAutres(sauf: publication.version)
+        if let deja = InstallationMiseAJour.dejaPrete(pour: publication.version) {
+            etatMiseAJour = .prete(deja); return
+        }
+        guard publication.telechargement != nil else {
+            etatMiseAJour = .echouee("Cette version n'a pas d'application prête à installer.")
+            return
+        }
+        etatMiseAJour = .enPreparation
+        do {
+            etatMiseAJour = .prete(try await InstallationMiseAJour.preparer(publication))
+        } catch {
+            etatMiseAJour = .echouee(error.localizedDescription)
+        }
+    }
+
+    /// Remplace l'application et la relance. Greffier quitte juste après : le
+    /// script attend sa fin avant de toucher au bundle.
+    func installer(_ prete: URL) {
+        installationEnCours = true
+        do {
+            try InstallationMiseAJour.installerPuisRelancer(
+                prete, remplace: Bundle.main.bundleURL)
+            // Laisser au script le temps de démarrer avant de disparaître.
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                NSApp.terminate(nil)
+            }
+        } catch {
+            installationEnCours = false
+            etatMiseAJour = .echouee(error.localizedDescription)
+        }
     }
 
     /// Écarte cette version : elle ne sera plus signalée, la suivante le sera.
@@ -266,24 +319,77 @@ struct MenuGreffier: View {
                             .foregroundStyle(Teinte.texte)
                     }
                     if let notes = maj.notes {
-                        Text(notes).font(.system(size: 11))
+                        // Les notes arrivent en Markdown : affichées telles
+                        // quelles, on lisait « ## Le premier lancement… ».
+                        Text(Session.apercu(de: notes)).font(.system(size: 11))
                             .foregroundStyle(Teinte.texteDoux)
                             .lineLimit(3).fixedSize(horizontal: false, vertical: true)
                     }
-                    HStack(spacing: gouttiere) {
-                        BoutonDiscret(titre: maj.telechargement == nil ? "Voir" : "Télécharger",
-                                      icone: "arrow.down", pleineLargeur: true) {
-                            NSWorkspace.shared.open(maj.telechargement ?? maj.page)
-                        }
-                        BoutonDiscret(titre: "Plus tard", pleineLargeur: true) {
-                            veilleur.miseAJour = nil
-                        }
-                        BoutonDiscret(titre: "Ignorer", pleineLargeur: true) {
-                            veilleur.ecarter(maj)
-                        }
-                        .help("Cette version ne sera plus signalée. La suivante le sera.")
+                    etatDeLaPreparation
+                    actionsMiseAJour(maj)
+                }
+            }
+        }
+    }
+
+    /// Ce qui se passe pendant que la nouvelle version se prépare.
+    @ViewBuilder private var etatDeLaPreparation: some View {
+        switch veilleur.etatMiseAJour {
+        case .enPreparation:
+            HStack(spacing: 7) {
+                ProgressView().controlSize(.small)
+                Text("Téléchargement en cours…").font(.system(size: 11))
+                    .foregroundStyle(Teinte.texteFaible)
+            }
+        case .prete:
+            HStack(spacing: 6) {
+                Image(systemName: "checkmark.circle.fill").font(.system(size: 10))
+                    .foregroundStyle(Teinte.vert)
+                Text("Téléchargée. Un clic et Greffier redémarre à jour.")
+                    .font(.system(size: 11)).foregroundStyle(Teinte.texteFaible)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        case .echouee(let raison):
+            Text(raison).font(.system(size: 11)).foregroundStyle(Teinte.ambre)
+                .fixedSize(horizontal: false, vertical: true)
+        case .aPreparer:
+            EmptyView()
+        }
+    }
+
+    @ViewBuilder private func actionsMiseAJour(
+        _ maj: VerificationVersion.Publication) -> some View {
+        if veilleur.installationEnCours {
+            HStack(spacing: 7) {
+                ProgressView().controlSize(.small)
+                Text("Installation… Greffier va redémarrer.")
+                    .font(.system(size: 11)).foregroundStyle(Teinte.texteDoux)
+            }
+        } else {
+            HStack(spacing: gouttiere) {
+                switch veilleur.etatMiseAJour {
+                case .prete(let bundle):
+                    BoutonPrincipal(titre: "Installer", icone: "arrow.down.circle",
+                                    pleineLargeur: true) {
+                        veilleur.installer(bundle)
+                    }
+                case .enPreparation:
+                    BoutonDiscret(titre: "Patientez…", actif: false, pleineLargeur: true) {}
+                case .aPreparer, .echouee:
+                    // Sans fichier joint — ou si la préparation a échoué — il
+                    // reste la page de la publication.
+                    BoutonDiscret(titre: "Voir", icone: "arrow.up.forward",
+                                  pleineLargeur: true) {
+                        NSWorkspace.shared.open(maj.page)
                     }
                 }
+                BoutonDiscret(titre: "Plus tard", pleineLargeur: true) {
+                    veilleur.miseAJour = nil
+                }
+                BoutonDiscret(titre: "Ignorer", pleineLargeur: true) {
+                    veilleur.ecarter(maj)
+                }
+                .help("Cette version ne sera plus signalée. La suivante le sera.")
             }
         }
     }
@@ -424,6 +530,12 @@ struct MenuGreffier: View {
                     NSApplication.shared.terminate(nil)
                 }
             }
+            // Savoir ce qui tourne, sans avoir à le chercher : c'est aussi ce
+            // qui permet de vérifier qu'une mise à jour a bien pris.
+            Text("Version \(versionGreffier)")
+                .font(.system(size: 10)).foregroundStyle(Teinte.texteFaible)
+                .frame(maxWidth: .infinity)
+                .padding(.top, 6)
         }
     }
 

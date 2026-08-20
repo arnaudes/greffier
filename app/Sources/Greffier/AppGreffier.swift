@@ -141,6 +141,10 @@ struct VuePrincipale: View {
     @Bindable var veilleur: Veilleur
     @Bindable var reglages: Reglages
     @State private var accueilEcarte = false
+    /// La version qui tournait au lancement précédent, relevée une seule fois.
+    /// Le réglage est réécrit dans la foulée : sans cela, le bandeau
+    /// reparaîtrait à chaque ouverture.
+    @State private var versionPrecedente: String?
 
     var body: some View {
         // Le premier lancement est pris par la main : rien ne mettait les
@@ -155,6 +159,13 @@ struct VuePrincipale: View {
 
     private var travail: some View {
         VStack(spacing: 0) {
+            // La mise à jour vient d'aboutir : le dire, une fois.
+            if let precedente = versionPrecedente, !precedente.isEmpty,
+               precedente != versionGreffier {
+                BandeauMiseAJourFaite(version: versionGreffier) {
+                    versionPrecedente = nil
+                }
+            }
             if let alerte = session.alerteForfait {
                 BandeauAlerte(texte: alerte)
             }
@@ -168,6 +179,11 @@ struct VuePrincipale: View {
             contenu
         }
         .background(Teinte.fond)
+        .task {
+            guard versionPrecedente == nil else { return }
+            versionPrecedente = reglages.derniereVersionLancee
+            reglages.derniereVersionLancee = versionGreffier
+        }
         .overlay(alignment: .top) {
             if let annonce = session.annonceLexique {
                 AnnonceLexiqueVue(annonce: annonce) { session.annonceLexique = nil }
