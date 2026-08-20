@@ -22,7 +22,7 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-echo "Compilation d'Greffier ${VERSION}…"
+echo "Compilation de Greffier ${VERSION}…"
 swift build -c release --product Greffier
 
 # L'application est installée dans ~/Applications, et non dans le dépôt. Ce n'est pas de la cosmétique : macOS traite différemment un

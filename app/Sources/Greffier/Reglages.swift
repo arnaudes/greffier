@@ -50,6 +50,16 @@ final class Reglages {
         didSet { defaults.set(previenirDesMisesAJour, forKey: Cle.previenir) }
     }
 
+    /// Le parcours de premier lancement a-t-il été suivi ?
+    ///
+    /// Les pièces existaient — conditions vérifiées, écran d'identité, demandes
+    /// d'autorisation — mais rien ne les mettait bout à bout : on découvrait
+    /// qu'il fallait Claude Code au moment où la rédaction échouait. L'écran de
+    /// bienvenue ne s'affiche qu'une fois, et se laisse écarter.
+    var accueilFait: Bool {
+        didSet { defaults.set(accueilFait, forKey: Cle.accueilFait) }
+    }
+
     /// Quand on a regardé pour la dernière fois. Une fois par jour suffit.
     var derniereVerification: Date? {
         didSet { defaults.set(derniereVerification, forKey: Cle.derniereVerification) }
@@ -154,6 +164,7 @@ final class Reglages {
         static let apparence = "apparence"
         static let dossierDeTravail = "dossierDeTravail"
         static let previenir = "previenirDesMisesAJour"
+        static let accueilFait = "accueilFait"
         static let derniereVerification = "derniereVerification"
         static let versionEcartee = "versionEcartee"
     }
@@ -178,6 +189,7 @@ final class Reglages {
         previenirDesMisesAJour = defaults.object(forKey: Cle.previenir) as? Bool ?? true
         derniereVerification = defaults.object(forKey: Cle.derniereVerification) as? Date
         versionEcartee = defaults.string(forKey: Cle.versionEcartee) ?? ""
+        accueilFait = defaults.bool(forKey: Cle.accueilFait)
     }
 
     var configClaude: ConfigClaude {

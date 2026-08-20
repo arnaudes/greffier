@@ -50,39 +50,58 @@ une réunion commence quand quelqu'un dit « on y va », pas au moment prévu.
 | | |
 |---|---|
 | **macOS 14** ou plus récent | |
-| **[Claude Code](https://claude.com/claude-code)** installé et connecté | **indispensable** : la rédaction passe par votre abonnement |
+| **[Claude Code](https://claude.com/claude-code)** installé et **connecté** | **indispensable** : la rédaction passe par votre abonnement |
 | La **dictée** activée | Réglages Système → Clavier → Dictée, en français. La transcription en dépend, même hors ligne |
 | **Google Chrome** | seulement pour produire les PDF |
 
 Sans abonnement Claude Code, l'application enregistre et transcrit, mais ne
 rédige pas.
 
-L'onglet **État** des réglages vérifie ces conditions et les autres —
-autorisations du micro, de la reconnaissance vocale, de l'écran et du
-calendrier — et dit pour chacune ce qu'on perd sans elle.
-
 ## Installer
 
+**Il faut Xcode pour compiler.** Pas seulement les outils en ligne de commande :
+SwiftUI s'appuie sur des macros dont le greffon n'est livré qu'avec Xcode, et
+sans lui la compilation échoue par centaines d'erreurs qui semblent venir du
+code. C'est vérifié, pas supposé.
+
 ```bash
-git clone https://github.com/arnaudes/greffier.git
+git clone https://github.com/arnaudes/greffier
 cd greffier/app
 ./build.sh
 ```
 
 L'application est déposée dans `~/Applications/Greffier.app`.
 
-À la première ouverture, macOS affichera « développeur non identifié » :
-**clic droit sur l'application → Ouvrir**, puis confirmez. Une seule fois.
+Si vous n'avez pas Xcode et ne souhaitez pas l'installer — c'est une quinzaine
+de gigaoctets — demandez l'application déjà compilée à qui vous l'a fait
+connaître.
 
-Greffier demandera ensuite l'accès au micro, à la reconnaissance vocale, au
-calendrier et à l'enregistrement de l'écran — ce dernier sert à capter le son
-des autres participants en visioconférence, c'est le seul moyen que macOS offre
-de le faire sans installer de pilote audio.
+## Au premier lancement
 
-## Se présenter
+Greffier vous prend par la main : un écran de bienvenue règle en une fois ce
+qui, autrement, se découvre au pire moment.
 
-Ouvrez les réglages, onglet **Vous**. Le nom suffit à commencer, mais deux
-champs décident de la qualité des comptes rendus :
+Il vous demande **qui vous êtes**, vérifie que **Claude Code répond vraiment**
+— en lui posant une question, parce qu'un programme installé mais non connecté
+se comporte comme un programme absent jusqu'à la première rédaction — puis
+passe en revue les autorisations : micro, reconnaissance vocale, écran pour la
+visioconférence, calendrier.
+
+Chaque point dit ce que vous perdez sans lui, et porte le bouton qui le règle.
+L'écran ne revient plus ensuite ; tout s'y retrouve dans les réglages, onglets
+**Vous** et **État**.
+
+macOS demandera l'accès au micro, à la reconnaissance vocale, au calendrier et
+à l'enregistrement de l'écran — ce dernier sert à capter le son des autres
+participants en visioconférence, c'est le seul moyen que macOS offre de le
+faire sans installer de pilote audio. Il faut **quitter et rouvrir** Greffier
+après l'avoir accordé.
+
+## Affiner votre présentation
+
+L'écran de bienvenue vous a demandé l'essentiel. Vous pouvez y revenir et
+l'enrichir à tout moment : réglages, onglet **Vous**. Le nom suffit à
+commencer, mais deux champs décident de la qualité des comptes rendus :
 
 - **ce que fait votre société** — sans quoi Greffier ignore ce qu'est un
   livrable, un jalon ou une réserve dans votre métier ;

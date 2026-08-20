@@ -71,6 +71,18 @@ public struct Prerequis: Sendable, Equatable {
 
         /// Un manque qui empêcherait de capter une réunion — donc de la perdre
         /// pour toujours. Le reste se rattrape après coup.
+        /// L'autorisation se demande-t-elle depuis l'application ?
+        ///
+        /// La dictée, un programme absent et un dossier introuvable se règlent
+        /// ailleurs : proposer « Autoriser » là où rien ne peut être accordé
+        /// ferait cliquer sur un bouton qui ne fait rien.
+        public var peutSeDemander: Bool {
+            switch self {
+            case .micro, .reconnaissance, .calendrier, .ecran: true
+            case .dictee, .claude, .chrome, .dossier: false
+            }
+        }
+
         public var faitPerdreLaReunion: Bool {
             switch self {
             case .micro, .dictee, .reconnaissance, .dossier: true

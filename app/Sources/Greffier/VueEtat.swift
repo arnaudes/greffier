@@ -30,6 +30,23 @@ struct VueEtat: View {
                 Text("Aucune autorisation n'est demandée tant que vous ne cliquez pas.")
                     .font(.system(size: 11)).foregroundStyle(Teinte.texteFaible)
                     .padding(.top, 2)
+
+                Rectangle().fill(Teinte.trait).frame(height: 1).padding(.vertical, 12)
+                HStack(spacing: 10) {
+                    // L'écran de bienvenue ne s'affiche qu'une fois. Sans ce
+                    // bouton, on ne peut plus le retrouver — ni pour le relire,
+                    // ni pour le montrer à quelqu'un qu'on installe.
+                    BoutonDiscret(titre: "Revoir l'écran de bienvenue",
+                                  icone: "hand.wave") {
+                        reglages.accueilFait = false
+                    }
+                    Spacer()
+                }
+                Text("Il reprend ces conditions une par une, avec votre fiche et "
+                     + "la vérification de Claude Code. Fermez cette fenêtre pour "
+                     + "le voir.")
+                    .font(.system(size: 11)).foregroundStyle(Teinte.texteFaible)
+                    .fixedSize(horizontal: false, vertical: true)
             }
             .padding(20)
         }
@@ -92,7 +109,7 @@ struct VueEtat: View {
         HStack(spacing: 7) {
             if enCours == condition {
                 ProgressView().controlSize(.small)
-            } else if peutSeDemander(condition) {
+            } else if condition.peutSeDemander {
                 BoutonDiscret(titre: "Autoriser") {
                     Task {
                         enCours = condition
@@ -108,15 +125,6 @@ struct VueEtat: View {
             if condition == .dossier {
                 BoutonDiscret(titre: "Choisir") { choisirLeDossier() }
             }
-        }
-    }
-
-    /// L'autorisation se demande-t-elle depuis l'application ? La dictée, un
-    /// programme absent ou un dossier introuvable se règlent ailleurs.
-    private func peutSeDemander(_ condition: Prerequis.Condition) -> Bool {
-        switch condition {
-        case .micro, .reconnaissance, .calendrier, .ecran: true
-        case .dictee, .claude, .chrome, .dossier: false
         }
     }
 

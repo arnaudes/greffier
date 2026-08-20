@@ -5,7 +5,7 @@ import NoyauCR
 ///
 /// Trois colonnes : les dossiers à gauche, une question à la fois au centre, et
 /// à droite ce que l'outil sait déjà du dossier. Ce troisième panneau n'est pas
-/// décoratif — il rend visible le mécanisme qui fait la valeur d'Greffier et que
+/// décoratif — il rend visible le mécanisme qui fait la valeur de Greffier et que
 /// rien n'affichait jusqu'ici : les comptes rendus antérieurs qui seront relus,
 /// et le lexique qui fait décroître le nombre de questions.
 struct VueAtelier: View {

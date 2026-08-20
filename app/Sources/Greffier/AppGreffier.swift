@@ -93,7 +93,7 @@ struct AppGreffier: App {
 
     var body: some Scene {
         WindowGroup(id: "principale") {
-            VuePrincipale(session: session, veilleur: veilleur)
+            VuePrincipale(session: session, veilleur: veilleur, reglages: reglages)
                 .frame(minWidth: 1040, minHeight: 680)
                 .preferredColorScheme(reglages.apparence.schema)
                 .task {
@@ -139,9 +139,21 @@ struct AppGreffier: App {
 struct VuePrincipale: View {
     @Bindable var session: Session
     @Bindable var veilleur: Veilleur
+    @Bindable var reglages: Reglages
     @State private var accueilEcarte = false
 
     var body: some View {
+        // Le premier lancement est pris par la main : rien ne mettait les
+        // conditions bout à bout, et l'arrivant découvrait qu'il fallait
+        // Claude Code au moment où la rédaction échouait.
+        if !reglages.accueilFait {
+            VueBienvenue(reglages: reglages) { veilleur.rafraichir() }
+        } else {
+            travail
+        }
+    }
+
+    private var travail: some View {
         VStack(spacing: 0) {
             if let alerte = session.alerteForfait {
                 BandeauAlerte(texte: alerte)

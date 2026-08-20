@@ -41,7 +41,7 @@ public struct Lexique: Codable, Sendable {
     // sans usage pour le code : elle est ignorée à la lecture et réécrite par
     // `enregistrer(vers:)` pour ne pas disparaître au premier enrichissement.
     private static let apropos = """
-        Lexique persistant d'Greffier. Lu au début de chaque analyse, enrichi \
+        Lexique persistant de Greffier. Lu au début de chaque analyse, enrichi \
         après chaque interrogation validée. Le champ variantes ne \
         recense QUE des erreurs de transcription réellement observées : on n'y \
         invente pas de fautes hypothétiques. Voir docs/SPEC-generation.md § 8.

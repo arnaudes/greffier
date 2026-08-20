@@ -197,7 +197,7 @@ public enum ErreurPont: Error, LocalizedError {
                 + "« \(chemin) ». Il est pourtant peut-être bien installé : une application "
                 + "lancée depuis le Finder ne voit pas les mêmes dossiers qu'un terminal. "
                 + "Tapez « which claude » dans un terminal, puis recopiez le chemin obtenu "
-                + "dans les réglages d'Greffier, onglet Rédaction."
+                + "dans les réglages de Greffier, onglet Rédaction."
         case .processusTermine(let code, let err):
             "Le dialogue avec Claude s'est interrompu (code \(code))."
                 + (err.isEmpty ? "" : " \(err)")
