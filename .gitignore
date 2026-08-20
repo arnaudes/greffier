@@ -1,0 +1,29 @@
+# Journaux — régénérés à chaque exécution
+logs/
+
+# Les données ne vivent plus ici (19/08/2026) : comptes rendus, lexique,
+# enregistrements et documents de conception ont leur propre dépôt local, dans
+# ~/Documents/Greffier. Ce dépôt-ci a vocation à devenir public : rien de personnel
+# ni de relatif à un client ne doit pouvoir y entrer, même par mégarde.
+comptes-rendus/
+lexique/
+enregistrements/
+# Les documents de conception vivent dans le dépôt privé : les nommer un par
+# un ici reviendrait à publier ce qu'ils contiennent.
+docs/
+
+# Produits de compilation Xcode
+build/
+DerivedData/
+*.xcuserstate
+xcuserdata/
+.swiftpm/
+.build/
+
+# macOS
+.DS_Store
+
+# Swift Package Manager
+app/.build/
+app/Greffier.app/
+enregistrements/

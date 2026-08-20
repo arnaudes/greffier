@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <!--
+      Le Hardened Runtime exige que chaque accès matériel ou personnel soit
+      déclaré ici. Sans cette déclaration, macOS refuse l'accès d'emblée, sans
+      présenter la moindre fenêtre d'autorisation et sans laisser la moindre
+      trace : c'est ce qui a coûté une heure de recherche le 17/08/2026.
+      L'application n'est PAS en bac à sable : elle lit et écrit dans le dépôt
+      de l'utilisateur et pilote le binaire claude.
+    -->
+    <key>com.apple.security.device.audio-input</key>
+    <true/>
+    <key>com.apple.security.personal-information.calendars</key>
+    <true/>
+</dict>
+</plist>
